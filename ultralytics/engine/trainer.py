@@ -299,10 +299,10 @@ class BaseTrainer:
             iterations=iterations,
         )
         # Scheduler
-        self._setup_scheduler()
+        #self._setup_scheduler() # comment out for schedulerfree
         self.stopper, self.stop = EarlyStopping(patience=self.args.patience), False
         self.resume_training(ckpt)
-        self.scheduler.last_epoch = self.start_epoch - 1  # do not move
+        #self.scheduler.last_epoch = self.start_epoch - 1  # do not move # comment out for schedulerfree
         self.run_callbacks("on_pretrain_routine_end")
 
     def _do_train(self, world_size=1):
@@ -333,7 +333,7 @@ class BaseTrainer:
             self.run_callbacks("on_train_epoch_start")
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")  # suppress 'Detected lr_scheduler.step() before optimizer.step()'
-                self.scheduler.step()
+                ##self.scheduler.step()  ## comment out for schedulerfree
 
             self.model.train()
             if RANK != -1:
@@ -433,8 +433,8 @@ class BaseTrainer:
             if self.args.time:
                 mean_epoch_time = (t - self.train_time_start) / (epoch - self.start_epoch + 1)
                 self.epochs = self.args.epochs = math.ceil(self.args.time * 3600 / mean_epoch_time)
-                self._setup_scheduler()
-                self.scheduler.last_epoch = self.epoch  # do not move
+                #self._setup_scheduler()  #comment out for schedulerfree
+                #self.scheduler.last_epoch = self.epoch  # do not move  #comment out for schedulerfree
                 self.stop |= epoch >= self.epochs  # stop if exceeded epochs
             self.run_callbacks("on_fit_epoch_end")
             torch.cuda.empty_cache()  # clear GPU memory at end of epoch, may help reduce CUDA out of memory errors
