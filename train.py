@@ -9,6 +9,7 @@ python train.py --epochs 10 --imgsz 416 --task_name "test_run"
 import argparse
 from ultralytics import YOLO
 from allegroai import Task
+import schedulefree
 
 # Set up argparse for command line arguments
 parser = argparse.ArgumentParser(description='Train a YOLO model with custom parameters.')
