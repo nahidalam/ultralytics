@@ -14,6 +14,7 @@ from allegroai import Task
 parser = argparse.ArgumentParser(description='Train a YOLO model with custom parameters.')
 parser.add_argument('--epochs', type=int, default=30, help='Number of epochs for training')
 parser.add_argument('--imgsz', type=int, default=416, help='Image size')
+parser.add_argument('--lr0', type=float, default=0.001, help='lr0 aka lr for schedule free')
 parser.add_argument('--optimizer', type=str, default='auto', help='Pick your optimizer SGD/Adam/AdamW. Default is auto')
 parser.add_argument('--task_name', type=str, default='yolov8n-seg', help='Task name for ClearML')
 args = parser.parse_args()
@@ -27,7 +28,7 @@ task = Task.init(
 model = YOLO("yolov8n-seg.pt")  # load a pretrained segmentation model for finetuning
 
 # Use the model
-training_results = model.train(data="trainconfig.yaml", epochs=args.epochs, imgsz=args.imgsz, optimizer = args.optimizer, device=[0, 1, 2, 3, 4, 5, 6, 7])  # train the model
+training_results = model.train(data="trainconfig.yaml", epochs=args.epochs, imgsz=args.imgsz, lr0 = args.lr0, optimizer = args.optimizer, device=[0, 1, 2, 3, 4, 5, 6, 7])  # train the model
 optimizer = model["optimizer"]
 optimizer.train()
 metrics = model.val()  # evaluate model performance on the validation set
@@ -38,6 +39,6 @@ print("Metrics")
 print(metrics)
 
 # Connect arguments and metrics with ClearML task
-task_arguments = dict(data="trainconfig.yaml", epochs=args.epochs, imgsz=args.imgsz, optimizer = args.optimizer, val_metrics=metrics)
+task_arguments = dict(data="trainconfig.yaml", epochs=args.epochs, imgsz=args.imgsz, lr0 = args.lr0, optimizer = args.optimizer, val_metrics=metrics)
 task.connect(task_arguments)
 
